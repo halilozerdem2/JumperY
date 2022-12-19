@@ -7,49 +7,33 @@ using UnityEngine.Windows.Speech;
 
 public class CharacterController : MonoBehaviour
 {
+    public CollisionDetecter detecter;
+    public SpeedController speedController;
+
     private Rigidbody2D playerRb;
 
-    [SerializeField] float movingSpeed= 600f;
+    [SerializeField] float movingSpeed= 1500f;
     [SerializeField] float bounceSpeed = 200f;
-    [SerializeField] float jumpForce= 5f;
-
-
-    private bool isGrounded;
-    private bool isHitRigthWall;
-    private bool isHitLeftWall;
+    private float jumpForce;
 
 
     private void Awake()
     {
+        detecter= GetComponent<CollisionDetecter>();
+        speedController= GetComponent<SpeedController>();
         playerRb = GetComponent<Rigidbody2D>();
     }
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void Update()
     {
-        if (collision.gameObject.CompareTag("Ground"))
-            isGrounded = true;
-        else if (collision.gameObject.CompareTag("RightWall"))
-            isHitRigthWall = true;
-        else if (collision.gameObject.CompareTag("LeftWall"))
-            isHitLeftWall = true;
-
-    } 
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-            isGrounded = false;
-        else if (collision.gameObject.CompareTag("RightWall"))
-            isHitRigthWall = false;
-        else if (collision.gameObject.CompareTag("LeftWall"))
-            isHitLeftWall = false;
-
+        SetJumpPower();
+    
     }
 
     private void FixedUpdate()
     {
         Move();
         
-        if (isGrounded && Input.GetKey(KeyCode.Space))
+        if (detecter.isGrounded && Input.GetKey(KeyCode.Space))
             Jump();
     }
 
@@ -62,19 +46,35 @@ public class CharacterController : MonoBehaviour
     private void Move()
     {
         float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;
-        Debug.Log(moveAmount);
+        //Debug.Log(moveAmount);
         
         if(Mathf.Abs(playerRb.velocity.x)<=15)
         {
             playerRb.AddForce(new Vector2(moveAmount, playerRb.velocity.y));
 
-            if (isHitRigthWall)
+            if (detecter.isHitRightWall)
                 playerRb.AddForce(new Vector2(-bounceSpeed, playerRb.velocity.y));
-            else if(isHitLeftWall)
+            else if(detecter.isHitLeftWall)
                 playerRb.AddForce(new Vector2(bounceSpeed, playerRb.velocity.y));
 
         }
         
+    }
+    private float SetJumpPower()
+    {
+        Debug.Log(playerRb.velocity.x);
+        
+        if(Mathf.Abs(playerRb.velocity.x) == 0) 
+            jumpForce= 6f;
+
+        else if((Mathf.Abs(playerRb.velocity.x) > 0 && (Mathf.Abs(playerRb.velocity.x) < 5)))
+            jumpForce = 7f;
+        else if((Mathf.Abs(playerRb.velocity.x) > 5 && (Mathf.Abs(playerRb.velocity.x) < 10)))
+            jumpForce = 8f;
+        else
+            jumpForce = 10f;
+
+        return jumpForce;
     }
 
 }
