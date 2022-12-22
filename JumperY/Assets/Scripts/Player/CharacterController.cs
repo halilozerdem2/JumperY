@@ -12,8 +12,11 @@ public class CharacterController : MonoBehaviour
 
     private Rigidbody2D playerRb;
 
+    private Vector2 playerPos;
+
     [SerializeField] float movingSpeed= 1500f;
     [SerializeField] float bounceSpeed = 200f;
+
     private float jumpForce;
 
 
@@ -45,7 +48,9 @@ public class CharacterController : MonoBehaviour
 
     private void Move()
     {
-        float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;
+       float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;
+        if (!detecter.isGrounded)
+            moveAmount *= 2;
         //Debug.Log(moveAmount);
         
         if(Mathf.Abs(playerRb.velocity.x)<=15)
@@ -54,7 +59,8 @@ public class CharacterController : MonoBehaviour
 
             if (detecter.isHitRightWall)
                 playerRb.AddForce(new Vector2(-bounceSpeed, playerRb.velocity.y));
-            else if(detecter.isHitLeftWall)
+         
+            else if (detecter.isHitLeftWall)
                 playerRb.AddForce(new Vector2(bounceSpeed, playerRb.velocity.y));
 
         }
@@ -75,6 +81,11 @@ public class CharacterController : MonoBehaviour
             jumpForce = 10f;
 
         return jumpForce;
+    }
+    public Vector2 GetPlayerPos() 
+    { 
+        playerPos=transform.GetChild(0).position;
+        return playerPos; 
     }
 
 }
