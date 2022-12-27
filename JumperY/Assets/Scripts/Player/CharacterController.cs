@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TreeEditor;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -9,15 +11,16 @@ public class CharacterController : MonoBehaviour
 {
     public CollisionDetecter detecter;
     public SpeedController speedController;
-
     private Rigidbody2D playerRb;
 
-    private Vector2 playerPos;
+    private Collider2D playerCollider;
+    private PlatformTrigger platformCollider;
 
     [SerializeField] float movingSpeed= 1500f;
-    [SerializeField] float bounceSpeed = 200f;
-
+    public float coolDown;
     private float jumpForce;
+    private bool isFacingRight = true;
+    private Vector3 playerPos;
 
 
     private void Awake()
@@ -26,18 +29,31 @@ public class CharacterController : MonoBehaviour
         speedController= GetComponent<SpeedController>();
         playerRb = GetComponent<Rigidbody2D>();
     }
+    private void Start()
+    {
+        
+    }
     private void Update()
     {
+        coolDown += Time.deltaTime;
         SetJumpPower();
-    
+        
     }
 
     private void FixedUpdate()
     {
-        Move();
-        
+       
         if (detecter.isGrounded && Input.GetKey(KeyCode.Space))
-            Jump();
+        {
+            if(coolDown> 0.035f)
+            {
+                Jump();
+            }
+        }
+        Move();
+
+        AssignRotation();
+       
     }
 
     private void Jump()
@@ -45,44 +61,47 @@ public class CharacterController : MonoBehaviour
         float jumpAmount = jumpForce * Time.deltaTime;
         playerRb.velocity=new Vector2 (playerRb.velocity.x, jumpForce);
     }
-
     private void Move()
     {
-       float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;
+        float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;;
         if (!detecter.isGrounded)
             moveAmount *= 2;
-        //Debug.Log(moveAmount);
-        
-        if(Mathf.Abs(playerRb.velocity.x)<=15)
+      
+        if (Mathf.Abs(playerRb.velocity.x) <= 15)
         {
-            playerRb.AddForce(new Vector2(moveAmount, playerRb.velocity.y));
-
-            if (detecter.isHitRightWall)
-                playerRb.AddForce(new Vector2(-bounceSpeed, playerRb.velocity.y));
-         
-            else if (detecter.isHitLeftWall)
-                playerRb.AddForce(new Vector2(bounceSpeed, playerRb.velocity.y));
-
+            playerRb.AddForce(new Vector2(moveAmount, playerRb.velocity.y+5f));
         }
         
     }
-    private float SetJumpPower()
+
+    private void AssignRotation()
     {
-        Debug.Log(playerRb.velocity.x);
-        
+        if (playerRb.velocity.x > 0 && !isFacingRight)
+            ChangeDirection();
+        else if(playerRb.velocity.x < 0 && isFacingRight)
+            ChangeDirection();
+    }
+   private void ChangeDirection()
+    {
+        isFacingRight = !isFacingRight;
+        transform.localScale = new Vector2(-transform.localScale.x,transform.localScale.y);
+    }
+
+    private float SetJumpPower()
+    {   
         if(Mathf.Abs(playerRb.velocity.x) == 0) 
-            jumpForce= 6f;
+            jumpForce= 15f;
 
         else if((Mathf.Abs(playerRb.velocity.x) > 0 && (Mathf.Abs(playerRb.velocity.x) < 5)))
-            jumpForce = 7f;
+            jumpForce = 20f;
         else if((Mathf.Abs(playerRb.velocity.x) > 5 && (Mathf.Abs(playerRb.velocity.x) < 10)))
-            jumpForce = 8f;
+            jumpForce = 25;
         else
-            jumpForce = 10f;
+            jumpForce = 30;
 
         return jumpForce;
     }
-    public Vector2 GetPlayerPos() 
+    public Vector3 GetPlayerPos() 
     { 
         playerPos=transform.GetChild(0).position;
         return playerPos; 

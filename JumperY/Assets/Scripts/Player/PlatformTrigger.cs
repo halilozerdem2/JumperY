@@ -18,7 +18,8 @@ public class PlatformTrigger : MonoBehaviour
     }
     private void Start()
     {
-        platformCollider.enabled = false;
+        platformCollider.enabled = true;
+        platformCollider.isTrigger = true;
     }
     private void Update()
     {
@@ -31,9 +32,9 @@ public class PlatformTrigger : MonoBehaviour
     private void FixedUpdate()
     {
         if(canCollide) 
-            platformCollider.enabled = true;
+            platformCollider.isTrigger= false;
         else
-            platformCollider.enabled = false;
+            platformCollider.isTrigger= true;
     }
    
 }
