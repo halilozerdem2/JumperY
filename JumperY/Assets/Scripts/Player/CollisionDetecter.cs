@@ -24,6 +24,7 @@ public class CollisionDetecter : MonoBehaviour
             isGrounded = true;
             isJumping = false;
         }
+
         else if (collision.gameObject.CompareTag("RightWall"))
             isHitRightWall = true;
         else if (collision.gameObject.CompareTag("LeftWall"))

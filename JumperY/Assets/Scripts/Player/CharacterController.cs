@@ -11,38 +11,47 @@ public class CharacterController : MonoBehaviour
 {
     public CollisionDetecter detecter;
     public SpeedController speedController;
+    public Animator animator;
     private Rigidbody2D playerRb;
 
-    private Collider2D playerCollider;
-    private PlatformTrigger platformCollider;
-
     [SerializeField] float movingSpeed= 1500f;
-    public float coolDown;
+    [SerializeField] public float coolDown;
+    [SerializeField] private float threshold = 0.1f;
+
+    private Vector3 playerPos;
     private float jumpForce;
     private bool isFacingRight = true;
-    private Vector3 playerPos;
+    public bool isMovingUp;
 
 
     private void Awake()
     {
         detecter= GetComponent<CollisionDetecter>();
         speedController= GetComponent<SpeedController>();
+        animator = GetComponent<Animator>();
         playerRb = GetComponent<Rigidbody2D>();
     }
-    private void Start()
-    {
-        
-    }
+
     private void Update()
     {
+        if (playerRb.velocity.y > threshold)
+        {
+            isMovingUp = true;
+        }
+        else
+        {
+            isMovingUp = false;
+            
+        }
+        animator.SetBool("isJumping", isMovingUp);
+
         coolDown += Time.deltaTime;
         SetJumpPower();
         
     }
 
     private void FixedUpdate()
-    {
-       
+    {  
         if (detecter.isGrounded && Input.GetKey(KeyCode.Space))
         {
             if(coolDown> 0.035f)
@@ -64,14 +73,14 @@ public class CharacterController : MonoBehaviour
     private void Move()
     {
         float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;;
+        animator.SetFloat("Speed", Mathf.Abs(Input.GetAxis("Horizontal")));
         if (!detecter.isGrounded)
-            moveAmount *= 2;
+            moveAmount = moveAmount+(0.25f*moveAmount);
       
         if (Mathf.Abs(playerRb.velocity.x) <= 15)
         {
             playerRb.AddForce(new Vector2(moveAmount, playerRb.velocity.y+5f));
         }
-        
     }
 
     private void AssignRotation()
