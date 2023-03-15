@@ -47,7 +47,7 @@ public class CameraFollow : MonoBehaviour
 
         if (player.isMovingUp)
         {
-            Vector3 characterTarget = new Vector3(0, player.GetPlayerPos().y + 3f, -1f);
+            Vector3 characterTarget = new Vector3(0, player.GetPlayerPos().y + 2f, -1f);
             this.transform.position = Vector3.Lerp(transform.position,
                                       characterTarget, cameraMovingSpeed * Time.deltaTime);
         }
@@ -59,7 +59,7 @@ public class CameraFollow : MonoBehaviour
         if (!isWithinViewport)
         {
             //Game Over
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene("MainMenu");
         }
     }
 
