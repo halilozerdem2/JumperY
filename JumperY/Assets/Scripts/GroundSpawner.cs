@@ -6,6 +6,7 @@ public class GroundSpawner : MonoBehaviour
 {
     public List<GameObject> platformPrefabs;
     public CharacterController player;
+    public int spawnCount=0;
     Vector3 spawnPoint;
 
     private void Awake()
@@ -15,21 +16,23 @@ public class GroundSpawner : MonoBehaviour
     }
     private void Start()
     {
-        SpawnPlatforms();
+        SpawnPlatform();
 
     }
     private void Update()
     {
         if(Mathf.Abs(player.GetPlayerPos().y-spawnPoint.y)< 5f) 
         {
-            SpawnPlatforms();
+            SpawnPlatform();
         }
 
     }
-    public void SpawnPlatforms()
+    public void SpawnPlatform()
     {
         GameObject temp = Instantiate(platformPrefabs[Random.Range(0, platformPrefabs.Count - 1)], spawnPoint, Quaternion.identity);
         spawnPoint = temp.transform.GetChild(0).transform.position;
+        spawnCount++;
+        Destroy(temp, 30f);
     }
 
 }

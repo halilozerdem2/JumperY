@@ -23,7 +23,7 @@ public class PlatformTrigger : MonoBehaviour
     }
     private void Update()
     {
-        if (playerController.GetPlayerPos().y > this.transform.position.y)
+        if (playerController.GetPlayerPos().y+0.1f > this.transform.position.y)
             canCollide = true;
         else 
             canCollide= false;

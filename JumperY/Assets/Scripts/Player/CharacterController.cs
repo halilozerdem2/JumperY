@@ -77,7 +77,12 @@ public class CharacterController : MonoBehaviour
         float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime; ;
         animator.SetFloat("Speed", Mathf.Abs(Input.GetAxis("Horizontal")));
         if (!detecter.isGrounded)
-            moveAmount = moveAmount + (0.25f * moveAmount);
+        {
+           Vector3 targetPoisition= new Vector3(transform.position.x + Input.GetAxis("Horizontal") * 7f *
+                                Time.deltaTime, transform.position.y, transform.position.z);
+           transform.position= Vector3.MoveTowards(transform.position, targetPoisition, 8f* Time.deltaTime);
+        }
+            
 
         if (Mathf.Abs(playerRb.velocity.x) <= 15)
         {
@@ -87,9 +92,9 @@ public class CharacterController : MonoBehaviour
 
     private void AssignRotation()
     {
-        if (playerRb.velocity.x > 0 && !isFacingRight)
+        if (Input.GetAxis("Horizontal") > 0 && !isFacingRight)
             ChangeDirection();
-        else if (playerRb.velocity.x < 0 && isFacingRight)
+        else if (Input.GetAxis("Horizontal") < 0 && isFacingRight)
             ChangeDirection();
     }
     private void ChangeDirection()
@@ -103,15 +108,19 @@ public class CharacterController : MonoBehaviour
         if (Mathf.Abs(playerRb.velocity.x) == 0)
             jumpForce = 15f;
 
-        else if ((Mathf.Abs(playerRb.velocity.x) > 0 && (Mathf.Abs(playerRb.velocity.x) < 5)))
+        else if ((Mathf.Abs(playerRb.velocity.x) > 0f && (Mathf.Abs(playerRb.velocity.x) < 5f)))
+            jumpForce = 16f;
+        else if ((Mathf.Abs(playerRb.velocity.x) >= 5f && (Mathf.Abs(playerRb.velocity.x) < 10f)))
             jumpForce = 20f;
-        else if ((Mathf.Abs(playerRb.velocity.x) > 5 && (Mathf.Abs(playerRb.velocity.x) < 10)))
-        {
+        else if ((Mathf.Abs(playerRb.velocity.x) >= 10f && (Mathf.Abs(playerRb.velocity.x) < 15f)))
             jumpForce = 25;
+        else if ((Mathf.Abs(playerRb.velocity.x) >= 15f && (Mathf.Abs(playerRb.velocity.x) < 20f)))
+        {
+            jumpForce = 28f;
         }
         else
         {
-            jumpForce = 30;
+            jumpForce = 30f;
         }
 
         return jumpForce;

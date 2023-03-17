@@ -7,19 +7,20 @@ using UnityEngine.SceneManagement;
 public class CameraFollow : MonoBehaviour
 {
     public CharacterController player;
+    public GroundSpawner groundSpawner;
     
     public Vector2 cameraPos;
     private Vector3 cameraTarget;
-    public float cameraMovingSpeed = 10f;
+    public float cameraMovingSpeed = 2f;
     public bool isWithinViewport = false;
     public bool isGameOver;
 
     private Camera mainCamera;
 
-
     private void Awake()
     {
         player = FindObjectOfType<CharacterController>();
+        groundSpawner=FindObjectOfType<GroundSpawner>();
         mainCamera = Camera.main;
     }
     private void Start()
@@ -29,6 +30,7 @@ public class CameraFollow : MonoBehaviour
     private void Update()
     {
         CheckBoundries();
+        cameraMovingSpeed = (groundSpawner.spawnCount+3)/1.25f * Time.deltaTime;
     }
     private void LateUpdate()
     {
@@ -49,12 +51,12 @@ public class CameraFollow : MonoBehaviour
         {
             Vector3 characterTarget = new Vector3(0, player.GetPlayerPos().y + 2f, -1f);
             this.transform.position = Vector3.Lerp(transform.position,
-                                      characterTarget, cameraMovingSpeed * Time.deltaTime);
+                                      characterTarget, cameraMovingSpeed*2f);
         }
         else
         {
             this.transform.position = Vector3.Lerp(transform.position, 
-                                      cameraTarget, cameraMovingSpeed * Time.deltaTime);
+                                      cameraTarget, cameraMovingSpeed);
         }
         if (!isWithinViewport)
         {
