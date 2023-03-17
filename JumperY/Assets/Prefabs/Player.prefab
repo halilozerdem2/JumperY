@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 4170402645078593340}
   - component: {fileID: 4170402645078593283}
   - component: {fileID: 4170402645078593282}
+  - component: {fileID: 6880893640384149853}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -130,6 +131,25 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -153,6 +173,12 @@ Rigidbody2D:
   m_AngularDrag: 0.1
   m_GravityScale: 5
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -171,8 +197,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detecter: {fileID: 0}
   speedController: {fileID: 0}
+  screen: {fileID: 0}
+  animator: {fileID: 0}
   movingSpeed: 3500
   coolDown: 0
+  threshold: 0.1
+  isMovingUp: 0
+  flipping: 0
 --- !u!114 &4170402645078593282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,7 +217,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 0}
+  collider: {fileID: 0}
+  RightWall: {fileID: 0}
+  LeftWall: {fileID: 0}
   isGrounded: 0
   isHitRightWall: 0
   isHitLeftWall: 0
   isJumping: 0
+  canJump: 0
+--- !u!114 &6880893640384149853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170402645078593284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7dc64db1ff488e45b3e431238294246, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpForce: 0

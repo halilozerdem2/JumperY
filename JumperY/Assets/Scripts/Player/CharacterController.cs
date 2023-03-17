@@ -1,35 +1,31 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using TreeEditor;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Windows.Speech;
 
 public class CharacterController : MonoBehaviour
 {
     public CollisionDetecter detecter;
     public SpeedController speedController;
+    public SceneManagement manager;
+
     public Animator animator;
     private Rigidbody2D playerRb;
+
+    private Vector3 playerPos;
 
     [SerializeField] float movingSpeed = 1500f;
     [SerializeField] public float coolDown;
     [SerializeField] private float threshold = 0.1f;
 
-    private Vector3 playerPos;
-
-    private float jumpForce;
     private bool isFacingRight = true;
     public bool isMovingUp;
     public bool flipping = false;
-
+    private bool canMove => !manager.isGameOver;
 
     private void Awake()
     {
         detecter = GetComponent<CollisionDetecter>();
         speedController = GetComponent<SpeedController>();
+        manager=FindObjectOfType<SceneManagement>();
         animator = GetComponent<Animator>();
         playerRb = GetComponent<Rigidbody2D>();
     }
@@ -48,31 +44,33 @@ public class CharacterController : MonoBehaviour
         animator.SetBool("isJumping", isMovingUp);
 
         coolDown += Time.deltaTime;
-        SetJumpPower();
-
     }
 
     private void FixedUpdate()
     {
-        if (detecter.isGrounded && Input.GetKey(KeyCode.Space))
-        {
-            if (coolDown > 0.035f)
+            if (detecter.isGrounded && Input.GetKey(KeyCode.Space))
             {
-                Jump();
+                if (coolDown > 0.035f)
+                {
+                    StartCoroutine(Jump());
+                }
             }
+            StartCoroutine(Move());
+            StartCoroutine(AssignRotation());
+        if(manager.isGameOver)
+        {
+            StopAllCoroutines();
         }
-        Move();
-
-        AssignRotation();
-
     }
 
-    private void Jump()
+    public IEnumerator Jump()
     {
-        float jumpAmount = jumpForce * Time.deltaTime;
-        playerRb.velocity = new Vector2(playerRb.velocity.x, jumpForce);
+        float jumpAmount = speedController.jumpForce * Time.deltaTime;
+        playerRb.velocity = new Vector2(playerRb.velocity.x, speedController.jumpForce);
+        yield return null;
     }
-    private void Move()
+
+    public IEnumerator Move()
     {
         float moveAmount = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime; ;
         animator.SetFloat("Speed", Mathf.Abs(Input.GetAxis("Horizontal")));
@@ -83,19 +81,21 @@ public class CharacterController : MonoBehaviour
            transform.position= Vector3.MoveTowards(transform.position, targetPoisition, 8f* Time.deltaTime);
         }
             
-
         if (Mathf.Abs(playerRb.velocity.x) <= 15)
         {
             playerRb.AddForce(new Vector2(moveAmount, playerRb.velocity.y + 5f));
         }
+        yield return null;
+
     }
 
-    private void AssignRotation()
+    public IEnumerator AssignRotation()
     {
         if (Input.GetAxis("Horizontal") > 0 && !isFacingRight)
             ChangeDirection();
         else if (Input.GetAxis("Horizontal") < 0 && isFacingRight)
             ChangeDirection();
+        yield return null;
     }
     private void ChangeDirection()
     {
@@ -103,35 +103,6 @@ public class CharacterController : MonoBehaviour
         transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
     }
 
-    private float SetJumpPower()
-    {
-        if (Mathf.Abs(playerRb.velocity.x) == 0)
-            jumpForce = 15f;
-
-        else if ((Mathf.Abs(playerRb.velocity.x) > 0f && (Mathf.Abs(playerRb.velocity.x) < 5f)))
-            jumpForce = 16f;
-        else if ((Mathf.Abs(playerRb.velocity.x) >= 5f && (Mathf.Abs(playerRb.velocity.x) < 10f)))
-            jumpForce = 20f;
-        else if ((Mathf.Abs(playerRb.velocity.x) >= 10f && (Mathf.Abs(playerRb.velocity.x) < 15f)))
-            jumpForce = 25;
-        else if ((Mathf.Abs(playerRb.velocity.x) >= 15f && (Mathf.Abs(playerRb.velocity.x) < 20f)))
-        {
-            jumpForce = 28f;
-        }
-        else
-        {
-            jumpForce = 30f;
-        }
-
-        return jumpForce;
-    }
-
-    private void Flip()
-    {
-        flipping = true;
-        transform.Rotate(0, 0, -15f);
-        flipping = false;
-    }
 
     public Vector3 GetPlayerPos()
     {

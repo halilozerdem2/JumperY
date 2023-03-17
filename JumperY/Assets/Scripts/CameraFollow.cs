@@ -1,19 +1,18 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CameraFollow : MonoBehaviour
 {
+    public SceneManagement manager;
     public CharacterController player;
+    public ScreenShake shake;
     public GroundSpawner groundSpawner;
     
     public Vector2 cameraPos;
     private Vector3 cameraTarget;
     public float cameraMovingSpeed = 2f;
     public bool isWithinViewport = false;
-    public bool isGameOver;
 
     private Camera mainCamera;
 
@@ -21,6 +20,8 @@ public class CameraFollow : MonoBehaviour
     {
         player = FindObjectOfType<CharacterController>();
         groundSpawner=FindObjectOfType<GroundSpawner>();
+        manager=FindObjectOfType<SceneManagement>();
+        shake=GetComponent<ScreenShake>();
         mainCamera = Camera.main;
     }
     private void Start()
@@ -61,7 +62,15 @@ public class CameraFollow : MonoBehaviour
         if (!isWithinViewport)
         {
             //Game Over
-            SceneManager.LoadScene("MainMenu");
+            manager.isGameOver = true;
+            shake.Play();
+            StartCoroutine(LoadSceneDelayed("MainMenu", shake.shakeDuration));
+        }
+
+        IEnumerator LoadSceneDelayed(string sceneName, float delayTime)
+        {
+            yield return new WaitForSeconds(delayTime);
+            SceneManager.LoadScene(sceneName);
         }
     }
 
